@@ -1,11 +1,15 @@
-from .base import ImageCodec
-from .bmp import BMPCodec
-from .png import PNGCodec
+from .base import ImageAIc
+from .bmp import BMPAIc
+from .png import PNGAIc
+from .jpeg import JPEGAIc  # 添加JPEG编解码器
+from .gif import GIFAIc    # 添加GIF编解码器
 
 # 注册所有编解码器
 _REGISTERED_CODECS = [
-    BMPCodec(),
-    PNGCodec(),
+    BMPAIc(),
+    PNGAIc(),
+    JPEGAIc(),  # 添加JPEG编解码器
+    GIFAIc(),   # 添加GIF编解码器
 ]
 
 
@@ -27,4 +31,4 @@ def get_codec(file_path=None, header=None):
     raise ValueError("No compatible codec found")
 
 
-__all__ = ['get_codec', 'ImageCodec']
+__all__ = ['get_codec', 'ImageAIc', 'BMPAIc', 'PNGAIc', 'JPEGAIc', 'GIFAIc']

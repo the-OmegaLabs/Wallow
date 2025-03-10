@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from core import WallowImage
 
 
-class ImageCodec(ABC):
+class ImageAIc(ABC):
     supported_extensions = []
 
     @staticmethod
@@ -21,5 +21,5 @@ class ImageCodec(ABC):
         pass
 
 
-class BitmapCodec(ImageCodec):
+class BitmapCodec(ImageAIc):
     SUPPORTED_MODES = {'RGB', 'RGBA', 'L'}
