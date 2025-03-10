@@ -21,20 +21,15 @@ def sepia_filter(pixel_data):
 
 
 def apply_color_matrix(image, matrix):
-    """应用颜色变换矩阵 (RGB空间)"""
-    if image.mode != 'RGB':
-        image = image.convert('RGB')
-
-    r_m = matrix
-    g_m = matrix
-    b_m = matrix
+    # Matrix should be 3x3
+    r_matrix, g_matrix, b_matrix = matrix  # Unpack three rows
 
     processed = bytearray()
-    for i in range(0, len(image.data), 3):
-        r, g, b = image.data[i:i + 3]
-        nr = min(255, int(r * r_m + g * r_m + b * r_m))
-        ng = min(255, int(r * g_m + g * g_m + b * g_m))
-        nb = min(255, int(r * b_m + g * b_m + b * b_m))
+    for i in range(0, len(image._pixel_data), 3):
+        r, g, b = image._pixel_data[i:i + 3]
+        nr = min(255, int(r * r_matrix[0] + g * r_matrix[1] + b * r_matrix[2]))
+        ng = min(255, int(r * g_matrix[0] + g * g_matrix[1] + b * g_matrix[2]))
+        nb = min(255, int(r * b_matrix[0] + g * b_matrix[1] + b * b_matrix[2]))
         processed.extend([nr, ng, nb])
 
-    return WallowImage(processed, image.mode, image.size)
+    return WallowImage(processed, image.color_mode, (image.width, image.height))
