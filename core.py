@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import struct
+import tkinter as tk
 
 
 class ImageProcessor(ABC):
@@ -14,6 +15,10 @@ class ImageProcessor(ABC):
 
 
 class WallowImage(ImageProcessor):
+    def apply_operation(self, operation: str, **params) -> 'WallowImage':
+        self._operation_stack.append((operation, params))
+        return self
+
     def __init__(self, pixel_data, color_mode, dimensions):
         self._pixel_data = bytearray(pixel_data)
         self.color_mode = color_mode
@@ -22,7 +27,7 @@ class WallowImage(ImageProcessor):
 
     @classmethod
     def open(cls, file_path):
-        from .formats import get_codec
+        from formats import get_codec
         codec = get_codec(file_path)
         return codec.decode(file_path)
 
@@ -40,7 +45,7 @@ class WallowImage(ImageProcessor):
         return self
 
     def save(self, output_path, quality=85):
-        from .formats import get_codec
+        from formats import get_codec
         processed_data = self._process_pipeline()
         get_codec(output_path).encode(
             processed_data,
@@ -75,3 +80,20 @@ class WallowImage(ImageProcessor):
                 dst_pos = (y * new_width + x) * len(self.color_mode)
                 resized[dst_pos:dst_pos + 3] = data[src_pos:src_pos + 3]
         return resized
+
+    def to_tkinter_image(self):
+        if self.color_mode not in ('RGB', 'RGBA'):
+            raise ValueError("Only RGB and RGBA color modes are supported for tkinter conversion")
+
+        image = tk.PhotoImage(width=self.width, height=self.height)
+
+        pixels = []
+        bytes_per_pixel = len(self.color_mode)
+        for i in range(0, len(self._pixel_data), bytes_per_pixel):
+            r, g, b = self._pixel_data[i:i+3]
+            hex_color = f'#{r:02x}{g:02x}{b:02x}'
+            pixels.append(hex_color)
+
+        image.put('{' + ' '.join(pixels) + '}', to=(0, 0, self.width, self.height))
+
+        return image
